@@ -1,4 +1,24 @@
-# Angular Tour - [AngularJS](http://angularjs.org/) directive for giving a tour of your website.
+# Angular Tour - [AngularJS](http://angularjs.org/)  
+directive for giving a tour of your website.
+
+## Build & Comtribution
+
+To build Angular-Tour, you will need to start with some dependencies as below:
+1. Install [Node & npm](http://nodejs.org/)
+2. Install [Grunt](http://gruntjs.com/)
+3. Install [Ruby](https://www.ruby-lang.org/en/) & [Compass](http://compass-style.org/)
+
+After install the system dependencies, then you can build the Angular-Tour from the `src/` folder to `dist/` using GruntJS by the following steps:
+1. Install required JavaScript depenedencies by  
+```
+npm install
+```
+2. Build from source to dist by
+```
+grunt build
+```
+
+> Note that above command only works if you have `grunt-cli` installed
 
 ## Demo
 

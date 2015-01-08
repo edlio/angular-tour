@@ -1,7 +1,7 @@
 # Angular Tour - [AngularJS](http://angularjs.org/)  
 directive for giving a tour of your website.
 
-## Build & Comtribution
+## Build & Contribution
 
 To build Angular-Tour, you will need to start with some dependencies as below:
 

@@ -103,17 +103,19 @@ describe('Directive: tour', function () {
     var elm, scope, tour, tip1, tip2, tourScope;
 
     beforeEach(function() {
-      this.addMatchers({
-        toHaveOpenTourtips: function(noOfOpened) {
-          var tourtipElements = this.actual.find('div.tour-tip');
-          noOfOpened = noOfOpened;
+      jasmine.addMatchers({
+        toHaveOpenTourtips: function(util) {
+          return {
+            compare: function(actual, expected) {
+              var tourtipElements = actual.find('div.tour-tip');
 
-          this.message = function() {
-            return 'Expected \'' + angular.mock.dump(tourtipElements) + '\' to have \'' + noOfOpened +
-              '\' opened tour tips. Instead had \'' + tourtipElements.length + '\'.';
-          };
-
-          return tourtipElements.length === noOfOpened;
+              return {
+                pass: tourtipElements.length === expected,
+                message: 'Expected \'' + angular.mock.dump(tourtipElements) + '\' to have \'' + expected +
+                  '\' opened tour tips. Instead had \'' + tourtipElements.length + '\'.'
+              }
+            }
+          }
         }
       });
 
@@ -189,11 +191,11 @@ describe('Directive: tour', function () {
       });
     });
 
-    describe('tour', function() {  
+    describe('tour', function() {
 
       var scope, elm, tour, tip1, tip2;
 
-      beforeEach(function() {  
+      beforeEach(function() {
         scope = $rootScope.$new();
         scope.stepIndex = 0;
         scope.otherStepIndex = -1;
@@ -210,9 +212,9 @@ describe('Directive: tour', function () {
         tour.append(tip1);
         tour.append(tip2);
 
-        elm = $compile(tour)(scope);        
+        elm = $compile(tour)(scope);
         scope.$apply();
-        $timeout.flush();        
+        $timeout.flush();
       });
       afterEach(function() {
         scope.$destroy();
@@ -233,7 +235,7 @@ describe('Directive: tour', function () {
         spyOn(scope, 'tourStep')
         // find next button in tour
         var tour1Next = elm.find('.tour-next-tip').eq(0);
-        tour1Next.click();        
+        tour1Next.click();
         expect(scope.tourStep).toHaveBeenCalled();
       });
 
@@ -242,7 +244,7 @@ describe('Directive: tour', function () {
         scope.tourComplete = function() {
           scope.otherStepIndex = 0;
         };
-        
+
         // set up second tour
         var otherTour = angular.element('<tour step="otherStepIndex"></tour>');
         var otherTip1 = angular.element('<span tourtip="feature 1 of other tour!">' +
@@ -352,11 +354,13 @@ describe('Directive: tour', function () {
   });
 
   describe('scroll service', function() {
-    var target, scope, scrollTo;
+    var target, scope, scrollTo, $timeout, $q;
 
-    beforeEach(inject(function (_scrollTo_) {
+    beforeEach(inject(function (_scrollTo_, _$timeout_, _$q_) {
       scope = $rootScope.$new();
       scrollTo = _scrollTo_;
+      $timeout = _$timeout_;
+      $q = _$q_;
 
       target = angular.element('<div id=\"target\" style=\"position:absolute; top:200px;\"></div>');
       $('body').height(window.innerHeight*2).append(target);
@@ -366,12 +370,15 @@ describe('Directive: tour', function () {
     it('should scroll to position', function () {
       expect($(window).scrollTop()).toEqual(0);
 
-      scrollTo(target);
-      waitsFor(function() {
-        return $(window).scrollTop() === 100;
-      }, 'Current position to be 100px');
+      var deferred = $q.defer();
 
-      runs(function() {
+      scrollTo(target);
+
+      $timeout(function() {
+        deferred.resolve('Wait for 1 second until scrolling to target');
+      }, 1000);
+
+      deferred.promise.then(function() {
         expect($(window).scrollTop()).toEqual(100);
       });
     });

@@ -3,6 +3,8 @@ directive for giving a tour of your website.
 
 ## Build & Contribution
 
+### Build
+
 To build Angular-Tour, you will need to start with some dependencies as below:
 
 1. Install [Node & npm](http://nodejs.org/)
@@ -21,6 +23,13 @@ grunt build
 ```
 
 > Note that above command only works if you have `grunt-cli` installed
+
+### Testing
+
+To test the Angular-Tour, we are using Jasmine in order to test AngularJS logics ... to do so, run the following:  
+```
+grunt test
+```
 
 ## Demo
 

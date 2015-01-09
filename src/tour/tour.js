@@ -138,7 +138,7 @@ angular.module('angular-tour.tour', [])
 
         scope.isFirstStep = function() {
           return ctrl.isFirstStep();
-        }
+        };
 
         scope.isLastStep = function() {
           return ctrl.isLastStep();
@@ -176,11 +176,11 @@ angular.module('angular-tour.tour', [])
 
         attrs.$observe( 'tourtipPreviousLabel', function ( val ) {
           scope.ttPreviousLabel = val || tourConfig.previousLabel;
-        })
+        });
 
         attrs.$observe( 'tourtipLastLabel', function( val ) {
           scope.ttFinishLabel = val || tourConfig.finishLabel;
-        })
+        });
 
         attrs.$observe( 'tourtipOffset', function ( val ) {
           scope.ttOffset = parseInt(val, 10) || tourConfig.offset;

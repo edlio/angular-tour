@@ -1,6 +1,6 @@
 /**
  * An AngularJS directive for showcasing features of your website
- * @version v0.1.1 - 2015-01-08
+ * @version v0.1.1 - 2015-01-09
  * @link https://github.com/DaftMonk/angular-tour
  * @author Tyler Henkel
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -159,9 +159,6 @@
           });
           attrs.$observe('tourtipPreviousLabel', function (val) {
             scope.ttPreviousLabel = val || tourConfig.previousLabel;
-          });
-          attrs.$observe('tourtipFirstLabel', function (val) {
-            scope.ttFirstLabel = val || tourConfig.firstLabel;
           });
           attrs.$observe('tourtipLastLabel', function (val) {
             scope.ttFinishLabel = val || tourConfig.finishLabel;

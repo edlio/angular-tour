@@ -107,7 +107,7 @@ describe('Directive: tour', function () {
         toHaveOpenTourtips: function(util) {
           return {
             compare: function(actual, expected) {
-              var tourtipElements = actual.find('div.tour-tip');
+              var tourtipElements = angular.element('body').find('div.tour-tip');
 
               return {
                 pass: tourtipElements.length === expected,
@@ -168,7 +168,11 @@ describe('Directive: tour', function () {
 
       it('should append tip1 popup to element and open it', function () {
         expect(elm).toHaveOpenTourtips(1);
-        expect(tip1.next().html()).toContain('feature 1');
+
+        // Note that since the tourtip is append to the body, we are actually
+        // going to query for the last Child under body to see if the tourtip
+        // is appended correctly
+        expect(angular.element(document.body.lastChild).html()).toContain('feature 1');
         expect(tip1.scope().ttOpen).toBe(true);
       });
 
@@ -177,17 +181,21 @@ describe('Directive: tour', function () {
 
         elmNext.click();
 
-        expect(elm).toHaveOpenTourtips(1);
-        expect(tip1.scope().ttOpen).toBe(false);
-        expect(tip2.scope().ttOpen).toBe(true);
+        $timeout(function() {
+          expect(elm).toHaveOpenTourtips(1);
+          expect(tip1.scope().ttOpen).toBe(false);
+          expect(tip2.scope().ttOpen).toBe(true);
+        }, 500);
       });
 
       it('should close tips when you click close', function () {
         var elmNext = elm.find('.tour-close-tip').eq(0);
         elmNext.click();
 
-        expect(tip1.scope().ttOpen).toBe(false);
-        expect(tip2.scope().ttOpen).toBe(false);
+        $timeout(function() {
+          expect(tip1.scope().ttOpen).toBe(false);
+          expect(tip2.scope().ttOpen).toBe(false);
+        }, 500);
       });
     });
 
@@ -227,7 +235,10 @@ describe('Directive: tour', function () {
         var tour1Next = elm.find('.tour-next-tip').eq(0);
         tour1Next.click();
         tour1Next.click();
-        expect(scope.tourComplete).toHaveBeenCalled();
+
+        $timeout(function() {
+          expect(scope.tourComplete).toHaveBeenCalled();
+        }, 500);
       });
 
       it('should call post-step method', function() {
@@ -236,7 +247,10 @@ describe('Directive: tour', function () {
         // find next button in tour
         var tour1Next = elm.find('.tour-next-tip').eq(0);
         tour1Next.click();
-        expect(scope.tourStep).toHaveBeenCalled();
+
+        $timeout(function() {
+          expect(scope.tourStep).toHaveBeenCalled();
+        }, 500);
       });
 
       it('should be able to handle multiple tours', function() {
@@ -270,23 +284,34 @@ describe('Directive: tour', function () {
         // finish first tour, expect tours to open and close correctly
         expect(tip1.scope().ttOpen).toBe(true);
         expect(tip2.scope().ttOpen).toBe(false);
-        tour1Next.click();
-        expect(tip1.scope().ttOpen).toBe(false);
-        expect(tip2.scope().ttOpen).toBe(true);
+
         tour1Next.click();
 
-        // recompile the other tour element after the first tour finishes
-        otherElm = $compile(otherTour)(scope);
-        scope.$apply();
-        $timeout.flush();
-        var tour2Next = otherElm.find('.tour-next-tip').eq(0);
+        $timeout(function() {
+          expect(tip1.scope().ttOpen).toBe(false);
+          expect(tip2.scope().ttOpen).toBe(true);
 
-        // expect second tour to open after first tour finished
-        expect(otherTip1.scope().ttOpen).toBe(true);
-        expect(otherTip2.scope().ttOpen).toBe(false);
-        tour2Next.click();
-        expect(otherTip1.scope().ttOpen).toBe(false);
-        expect(otherTip2.scope().ttOpen).toBe(true);
+          tour1Next.click();
+
+          // recompile the other tour element after the first tour finishes
+          otherElm = $compile(otherTour)(scope);
+          scope.$apply();
+          $timeout.flush();
+          var tour2Next = otherElm.find('.tour-next-tip').eq(0);
+
+          // expect second tour to open after first tour finished
+
+          $timeout(function() {
+            expect(otherTip1.scope().ttOpen).toBe(true);
+            expect(otherTip2.scope().ttOpen).toBe(false);
+          }, 500);
+          tour2Next.click();
+
+          $timeout(function() {
+            expect(otherTip1.scope().ttOpen).toBe(false);
+            expect(otherTip2.scope().ttOpen).toBe(true);
+          }, 500);
+        }, 500);
       });
     });
   });

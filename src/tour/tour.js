@@ -10,6 +10,8 @@ angular.module('angular-tour.tour', [])
     placement        : 'top',                  // default placement relative to target. 'top', 'right', 'left', 'bottom'
     animation        : true,                   // if tips fade in
     nextLabel        : 'Next',                 // default text in the next tip button
+    previousLabel    : 'Previous',             // default text in the previous tip button
+    finishLabel      : 'Finish',               // default finish in the finish tip button
     scrollSpeed      : 500,                    // page scrolling speed in milliseconds
     offset           : 28                      // how many pixels offset the tip is from the target
   })
@@ -66,6 +68,14 @@ angular.module('angular-tour.tour', [])
       steps.forEach(function (step) {
         step.ttOpen = false;
       });
+    };
+
+    self.isFirstStep = function() {
+      return steps.getCount() === 1;
+    };
+
+    self.isLastStep = function() {
+      return steps.getCount() - 1 === self.currentStep;
     };
 
     self.cancelTour = function () {
@@ -125,6 +135,14 @@ angular.module('angular-tour.tour', [])
         scope.getCurrentStep = function() {
           return ctrl.currentStep;
         };
+
+        scope.isFirstStep = function() {
+          return ctrl.isFirstStep();
+        }
+
+        scope.isLastStep = function() {
+          return ctrl.isLastStep();
+        };
       }
     };
   })
@@ -155,6 +173,14 @@ angular.module('angular-tour.tour', [])
         attrs.$observe( 'tourtipNextLabel', function ( val ) {
           scope.ttNextLabel = val || tourConfig.nextLabel;
         });
+
+        attrs.$observe( 'tourtipPreviousLabel', function ( val ) {
+          scope.ttPreviousLabel = val || tourConfig.previousLabel;
+        })
+
+        attrs.$observe( 'tourtipLastLabel', function( val ) {
+          scope.ttFinishLabel = val || tourConfig.finishLabel;
+        })
 
         attrs.$observe( 'tourtipOffset', function ( val ) {
           scope.ttOffset = parseInt(val, 10) || tourConfig.offset;
@@ -198,7 +224,7 @@ angular.module('angular-tour.tour', [])
           }
 
           // Append it to the dom
-          element.after( tourtip );
+          angular.element('body').append( tourtip );
 
           // Try to set target to the first child of our tour directive
           if(element.children().eq(0).length>0) {
@@ -209,37 +235,45 @@ angular.module('angular-tour.tour', [])
 
           var updatePosition = function() {
             // Get the position of the directive element
-            position = targetElement.position();
+            position = targetElement[0].getBoundingClientRect();
 
-            ttWidth = tourtip.width();
-            ttHeight = tourtip.height();
+            ttWidth = tourtip.width() +
+              parseInt(tourtip.css('padding-left')) +
+              parseInt(tourtip.css('padding-right'));
+            ttHeight = tourtip.height() +
+              parseInt(tourtip.css('padding-top'), 0) +
+              parseInt(tourtip.css('padding-bottom'), 0);
 
             width = targetElement.width();
             height = targetElement.height();
+
+            var top = position.top + window.pageYOffset;
+
+            var arrowTop = parseInt(tourtip.find('.tail').css('top'), 0);
 
             // Calculate the tourtip's top and left coordinates to center it
             switch ( scope.ttPlacement ) {
             case 'right':
               ttPosition = {
-                top: position.top,
+                top: top - arrowTop - (height/2),
                 left: position.left + width + scope.ttOffset
               };
               break;
             case 'bottom':
               ttPosition = {
-                top: position.top + height + scope.ttOffset,
+                top: top + height + scope.ttOffset,
                 left: position.left
               };
               break;
             case 'left':
               ttPosition = {
-                top: position.top,
+                top: top - arrowTop - (height/2),
                 left: position.left - ttWidth - scope.ttOffset
               };
               break;
             default:
               ttPosition = {
-                top: position.top - ttHeight - scope.ttOffset,
+                top: top - ttHeight - scope.ttOffset,
                 left: position.left
               };
               break;
@@ -300,7 +334,7 @@ angular.module('angular-tour.tour', [])
       this.map = {};
       this._array = [];
     };
-    
+
     OrderedList.prototype.set = function (key, value) {
       if (!angular.isNumber(key))
         return;
@@ -367,7 +401,7 @@ angular.module('angular-tour.tour', [])
     var orderedListFactory = function() {
       return new OrderedList();
     };
-    
+
     return orderedListFactory;
   })
 

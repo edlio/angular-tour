@@ -1,4 +1,4 @@
-# Angular Tour - [AngularJS](http://angularjs.org/)  
+# Angular Tour - [AngularJS](http://angularjs.org/)  [![Build Status](https://travis-ci.org/edlio/angular-tour.svg?branch=master)](https://travis-ci.org/edlio/angular-tour)
 directive for giving a tour of your website.
 
 ## Build & Contribution

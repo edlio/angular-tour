@@ -118,22 +118,52 @@ angular.module('angular-tour.tour', [])
           throw('The <tour> directive requires a `step` attribute to bind the current step to.');
         }
         var model = $parse(attrs.step);
-        var backdrop = false;
+        var hasBackdrop = false;
+
+        // for showing backdrop/overlay at the background with inline style
+        var backdrop = angular
+          .element('<div class="tourtip-backdrop"></div>');
+
+        // for highlight the target element with background color white and
+        // transition in between target elements
+        var tourtipHighlight = angular
+          .element('<div class="tourtip-highlight-helper"></div>');
 
         // Watch current step view model and update locally
         scope.$watch(attrs.step, function(newVal){
           ctrl.currentStep = newVal;
 
-          if (!backdrop && tourConfig.backdrop && newVal > 0) {
+          // Append backdrop element if not already there
+          if (!hasBackdrop && tourConfig.backdrop && newVal > 0) {
+
+            backdrop
+              .css(
+                {
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  position: 'fixed',
+                  opacity: 0.8,
+                  'background-color': '#000',
+                  'z-index': '1000',
+                  'transition': 'all .5s ease-out'
+                }
+              );
+
             angular.element('body')
-              .append(angular.element('<div class="tourtip-backdrop"></div>'));
-            backdrop = true;
+              .append(backdrop);
+            angular.element('body')
+              .append(tourtipHighlight);
+            hasBackdrop = true;
           }
         });
 
         ctrl.postTourCallback = function() {
-          if (backdrop && tourConfig.backdrop) {
-            angular.element('.tourtip-backdrop').detach();
+          // When the tour is over, remove the backdrop element
+          if (hasBackdrop && tourConfig.backdrop) {
+            backdrop.remove();
+            tourtipHighlight.remove();
           }
 
           if(angular.isDefined(attrs.postTour)) {
@@ -183,6 +213,8 @@ angular.module('angular-tour.tour', [])
       restrict: 'EA',
       scope: true,
       link: function (scope, element, attrs, tourCtrl) {
+        var targetElement;
+
         attrs.$observe( 'tourtip', function ( val ) {
           scope.ttContent = val;
         });
@@ -216,6 +248,14 @@ angular.module('angular-tour.tour', [])
         scope.index = parseInt(attrs.tourtipStep, 10);
 
         var tourtip = $compile( template )( scope );
+
+        // a transparent layer to block user action on target element
+        var tourtipHighlightBlockr = angular
+          .element('<div class="tourtip-highlight-blockr"></div>');
+
+        // Try to set target to the first child of our tour directive
+        targetElement = element;
+
         tourCtrl.addStep(scope);
 
         // wrap this in a time out because the tourtip won't compile right away
@@ -235,8 +275,7 @@ angular.module('angular-tour.tour', [])
             ttHeight,
             ttPosition,
             height,
-            width,
-            targetElement;
+            width;
 
           if ( ! scope.ttContent ) {
             return;
@@ -248,31 +287,51 @@ angular.module('angular-tour.tour', [])
             tourtip.css({ display: 'block' });
           }
 
+          angular.element('body').append(tourtipHighlightBlockr);
           // Append it to the dom
           angular.element('body').append( tourtip );
-
-          // Try to set target to the first child of our tour directive
-          if(element.children().eq(0).length>0) {
-            targetElement = element.children().eq(0);
-          } else {
-            targetElement = element;
-          }
 
           var updatePosition = function() {
             // Get the position of the directive element
             position = targetElement[0].getBoundingClientRect();
 
-            ttWidth = tourtip.width() +
-              parseInt(tourtip.css('padding-left')) +
-              parseInt(tourtip.css('padding-right'));
-            ttHeight = tourtip.height() +
-              parseInt(tourtip.css('padding-top'), 0) +
-              parseInt(tourtip.css('padding-bottom'), 0);
+            ttWidth = tourtip[0].offsetWidth;
+            ttHeight = tourtip[0].offsetHeight;
 
             width = targetElement.width();
             height = targetElement.height();
 
+
+            targetElement
+              .css(
+                {
+                 'z-index'          : 1002,
+                 position           : 'relative',
+                 transition         : 'all .05s linear .295s'
+                }
+              );
+
             var top = position.top + window.pageYOffset;
+
+            var highlightStyle = {};
+            highlightStyle.position = 'absolute';
+            highlightStyle.top = top;
+            highlightStyle.left = position.left;
+            highlightStyle.width = targetElement[0].offsetWidth;
+            highlightStyle.height = targetElement[0].offsetHeight;
+
+            var highlightBlockrStyle = angular.copy(highlightStyle);
+
+            highlightBlockrStyle.background = 'transparent';
+            highlightBlockrStyle['z-index'] = 1003;
+
+            highlightStyle['z-index'] = 1001;
+            highlightStyle['background-color'] = 'rgba(255,255,255,.8)';
+            highlightStyle['box-shadow'] = '0 2px 15px rgba(0,0,0,.4)';
+            highlightStyle['transition'] = 'all .3s ease-in';
+
+            angular.element('.tourtip-highlight-helper').css(highlightStyle);
+            tourtipHighlightBlockr.css(highlightBlockrStyle);
 
             var arrowTop = parseInt(tourtip.find('.tail').css('top'), 0);
 
@@ -322,6 +381,14 @@ angular.module('angular-tour.tour', [])
 
         function hide() {
           tourtip.detach();
+          targetElement
+            .css(
+              {
+                'z-index': '',
+                'position:': '',
+                transition:  ''
+              }
+            );
           angular.element($window).unbind('resize.' + scope.$id);
         }
 
@@ -329,6 +396,7 @@ angular.module('angular-tour.tour', [])
         scope.$on('$destroy', function onDestroyTourtip() {
           angular.element($window).unbind('resize.' + scope.$id);
           tourtip.remove();
+          tourtipHighlightBlockr.remove();
           tourtip = null;
         });
       }

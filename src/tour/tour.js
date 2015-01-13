@@ -13,7 +13,8 @@ angular.module('angular-tour.tour', [])
     previousLabel    : 'Previous',             // default text in the previous tip button
     finishLabel      : 'Finish',               // default finish in the finish tip button
     scrollSpeed      : 500,                    // page scrolling speed in milliseconds
-    offset           : 28                      // how many pixels offset the tip is from the target
+    offset           : 28,                     // how many pixels offset the tip is from the target
+    backdrop         : true                    // turn on/off backdrop
   })
 
   /**
@@ -52,7 +53,7 @@ angular.module('angular-tour.tour', [])
         self.currentStep = nextIndex;
       }
 
-      if(nextIndex > steps.lastStep) {
+      if(nextIndex > self.lastStep) {
         self.postTourCallback();
       }
       self.postStepCallback();
@@ -107,7 +108,7 @@ angular.module('angular-tour.tour', [])
    * Tour
    * directive that allows you to control the tour
    */
-  .directive('tour', function ($parse) {
+  .directive('tour', function ($parse, tourConfig) {
     return {
       controller: 'TourController',
       restrict: 'EA',
@@ -117,13 +118,24 @@ angular.module('angular-tour.tour', [])
           throw('The <tour> directive requires a `step` attribute to bind the current step to.');
         }
         var model = $parse(attrs.step);
+        var backdrop = false;
 
         // Watch current step view model and update locally
         scope.$watch(attrs.step, function(newVal){
           ctrl.currentStep = newVal;
+
+          if (!backdrop && tourConfig.backdrop && newVal > 0) {
+            angular.element('body')
+              .append(angular.element('<div class="tourtip-backdrop"></div>'));
+            backdrop = true;
+          }
         });
 
         ctrl.postTourCallback = function() {
+          if (backdrop && tourConfig.backdrop) {
+            angular.element('.tourtip-backdrop').detach();
+          }
+
           if(angular.isDefined(attrs.postTour)) {
             scope.$parent.$eval(attrs.postTour);
           }
@@ -230,9 +242,9 @@ angular.module('angular-tour.tour', [])
             return;
           }
 
-          if(scope.ttAnimation)
+          if (scope.ttAnimation) {
             tourtip.fadeIn();
-          else {
+          } else {
             tourtip.css({ display: 'block' });
           }
 

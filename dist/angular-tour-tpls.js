@@ -26,7 +26,8 @@
     previousLabel: 'Previous',
     finishLabel: 'Finish',
     scrollSpeed: 500,
-    offset: 28
+    offset: 28,
+    backdrop: true
   }).controller('TourController', [
     '$scope',
     'orderedList',
@@ -56,7 +57,7 @@
         if (self.currentStep !== nextIndex) {
           self.currentStep = nextIndex;
         }
-        if (nextIndex >= steps.lastStep) {
+        if (nextIndex > self.lastStep) {
           self.postTourCallback();
         }
         self.postStepCallback();
@@ -101,7 +102,8 @@
     }
   ]).directive('tour', [
     '$parse',
-    function ($parse) {
+    'tourConfig',
+    function ($parse, tourConfig) {
       return {
         controller: 'TourController',
         restrict: 'EA',
@@ -111,11 +113,19 @@
             throw 'The <tour> directive requires a `step` attribute to bind the current step to.';
           }
           var model = $parse(attrs.step);
+          var backdrop = false;
           // Watch current step view model and update locally
           scope.$watch(attrs.step, function (newVal) {
             ctrl.currentStep = newVal;
+            if (!backdrop && tourConfig.backdrop && newVal > 0) {
+              angular.element('body').append(angular.element('<div class="tourtip-backdrop"></div>'));
+              backdrop = true;
+            }
           });
           ctrl.postTourCallback = function () {
+            if (backdrop && tourConfig.backdrop) {
+              angular.element('.tourtip-backdrop').detach();
+            }
             if (angular.isDefined(attrs.postTour)) {
               scope.$parent.$eval(attrs.postTour);
             }
@@ -198,9 +208,9 @@
             if (!scope.ttContent) {
               return;
             }
-            if (scope.ttAnimation)
+            if (scope.ttAnimation) {
               tourtip.fadeIn();
-            else {
+            } else {
               tourtip.css({ display: 'block' });
             }
             // Append it to the dom

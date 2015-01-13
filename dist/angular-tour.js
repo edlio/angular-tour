@@ -254,7 +254,7 @@
               highlightBlockrStyle.background = 'transparent';
               highlightBlockrStyle['z-index'] = 1003;
               highlightStyle['z-index'] = 1001;
-              highlightStyle['background-color'] = 'rgba(255,255,255,.8)';
+              highlightStyle['background-color'] = 'rgba(255,255,255,.95)';
               highlightStyle['box-shadow'] = '0 2px 15px rgba(0,0,0,.4)';
               highlightStyle['transition'] = 'all .3s ease-in';
               angular.element('.tourtip-highlight-helper').css(highlightStyle);
@@ -301,6 +301,7 @@
           }
           function hide() {
             tourtip.detach();
+            tourtipHighlightBlockr.detach();
             targetElement.css({
               'z-index': '',
               'position:': '',
@@ -312,7 +313,6 @@
           scope.$on('$destroy', function onDestroyTourtip() {
             angular.element($window).unbind('resize.' + scope.$id);
             tourtip.remove();
-            tourtipHighlightBlockr.remove();
             tourtip = null;
           });
         }

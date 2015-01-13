@@ -1,6 +1,6 @@
 /**
  * An AngularJS directive for showcasing features of your website
- * @version v0.1.1 - 2015-01-09
+ * @version v0.1.1 - 2015-01-12
  * @link https://github.com/DaftMonk/angular-tour
  * @author Tyler Henkel
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -26,6 +26,8 @@
       self.postTourCallback = angular.noop;
       self.postStepCallback = angular.noop;
       self.currentStep = 0;
+      self.firstStep = 0;
+      self.lastStep = 0;
       // if currentStep changes, select the new step
       $scope.$watch(function () {
         return self.currentStep;
@@ -44,15 +46,22 @@
         if (self.currentStep !== nextIndex) {
           self.currentStep = nextIndex;
         }
-        if (nextIndex >= steps.getCount()) {
+        if (nextIndex >= steps.lastStep) {
           self.postTourCallback();
         }
         self.postStepCallback();
       };
       self.addStep = function (step) {
         if (angular.isNumber(step.index) && !isNaN(step.index)) {
+          if (step.index > self.lastStep) {
+            self.lastStep = step.index;
+          }
+          if (self.firstStep === 0 || step.index < self.firstStep) {
+            self.firstStep = step.index;
+          }
           steps.set(step.index, step);
         } else {
+          self.lastStep = steps.getCount();
           steps.push(step);
         }
       };
@@ -62,10 +71,10 @@
         });
       };
       self.isFirstStep = function () {
-        return steps.getCount() === 1;
+        return self.currentStep === self.firstStep;
       };
       self.isLastStep = function () {
-        return steps.getCount() - 1 === self.currentStep;
+        return self.currentStep === self.lastStep;
       };
       self.cancelTour = function () {
         self.unselectAllSteps();
@@ -140,6 +149,9 @@
         link: function (scope, element, attrs, tourCtrl) {
           attrs.$observe('tourtip', function (val) {
             scope.ttContent = val;
+          });
+          attrs.$observe('tourtipTitle', function (val) {
+            scope.ttTitle = val;
           });
           attrs.$observe('tourtipPlacement', function (val) {
             scope.ttPlacement = val || tourConfig.placement;

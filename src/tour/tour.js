@@ -28,6 +28,8 @@ angular.module('angular-tour.tour', [])
     self.postTourCallback = angular.noop;
     self.postStepCallback = angular.noop;
     self.currentStep = 0;
+    self.firstStep = 0;
+    self.lastStep = 0;
 
     // if currentStep changes, select the new step
     $scope.$watch( function() { return self.currentStep; },
@@ -50,7 +52,7 @@ angular.module('angular-tour.tour', [])
         self.currentStep = nextIndex;
       }
 
-      if(nextIndex >= steps.getCount()) {
+      if(nextIndex > steps.lastStep) {
         self.postTourCallback();
       }
       self.postStepCallback();
@@ -58,8 +60,15 @@ angular.module('angular-tour.tour', [])
 
     self.addStep = function(step) {
       if(angular.isNumber(step.index) && !isNaN(step.index)) {
+        if (step.index > self.lastStep) {
+          self.lastStep = step.index;
+        }
+        if (self.firstStep === 0 || step.index < self.firstStep) {
+          self.firstStep = step.index;
+        }
         steps.set(step.index, step);
       } else {
+        self.lastStep = steps.getCount();
         steps.push(step);
       }
     };
@@ -71,11 +80,11 @@ angular.module('angular-tour.tour', [])
     };
 
     self.isFirstStep = function() {
-      return steps.getCount() === 1;
+      return self.currentStep === self.firstStep;
     };
 
     self.isLastStep = function() {
-      return steps.getCount() - 1 === self.currentStep;
+      return self.currentStep === self.lastStep;
     };
 
     self.cancelTour = function () {
@@ -164,6 +173,10 @@ angular.module('angular-tour.tour', [])
       link: function (scope, element, attrs, tourCtrl) {
         attrs.$observe( 'tourtip', function ( val ) {
           scope.ttContent = val;
+        });
+
+        attrs.$observe( 'tourtipTitle', function( val ) {
+          scope.ttTitle = val;
         });
 
         attrs.$observe( 'tourtipPlacement', function ( val ) {

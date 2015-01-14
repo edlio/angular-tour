@@ -39,15 +39,14 @@
         if (!angular.isNumber(nextIndex))
           return;
         self.unselectAllSteps();
-        var step = steps.get(nextIndex);
-        if (step) {
-          step.ttOpen = true;
-        }
         // update currentStep if we manually selected this index
         if (self.currentStep !== nextIndex) {
           self.currentStep = nextIndex;
         }
-        if (nextIndex > self.lastStep) {
+        var step = steps.get(nextIndex);
+        if (step) {
+          step.ttOpen = true;
+        } else {
           self.postTourCallback();
         }
         self.postStepCallback();
@@ -83,7 +82,8 @@
       };
       $scope.openTour = function () {
         // open at first step if we've already finished tour
-        var startStep = self.currentStep >= steps.getCount() || self.currentStep < 0 ? 0 : self.currentStep;
+        var startStep = self.currentStep >= steps.getCount() || self.currentStep < 1 ? 1 : self.currentStep;
+        $scope.setCurrentStep(startStep);
         self.select(startStep);
       };
       $scope.closeTour = function () {
@@ -113,7 +113,7 @@
           scope.$watch(attrs.step, function (newVal) {
             ctrl.currentStep = newVal;
             // Append backdrop element if not already there
-            if (!hasBackdrop && tourConfig.backdrop && newVal > 0) {
+            if (!hasBackdrop && tourConfig.backdrop && newVal >= ctrl.firstStep && newVal <= ctrl.lastStep) {
               backdrop.css({
                 top: 0,
                 bottom: 0,
@@ -135,6 +135,7 @@
             if (hasBackdrop && tourConfig.backdrop) {
               backdrop.remove();
               tourtipHighlight.remove();
+              hasBackdrop = false;
             }
             if (angular.isDefined(attrs.postTour)) {
               scope.$parent.$eval(attrs.postTour);

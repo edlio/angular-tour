@@ -320,11 +320,10 @@ angular.module('angular-tour.tour', [])
 
             var highlightStyle = {};
             highlightStyle.position = 'absolute';
-            highlightStyle.top = (top - 14);
-            highlightStyle.left = (position.left - 14);
+            highlightStyle.top = top;
+            highlightStyle.left = position.left;
             highlightStyle.width = targetElement[0].offsetWidth;
             highlightStyle.height = targetElement[0].offsetHeight;
-            highlightStyle.padding = '14px';
 
             var highlightBlockrStyle = angular.copy(highlightStyle);
 
@@ -332,7 +331,6 @@ angular.module('angular-tour.tour', [])
             highlightBlockrStyle['z-index'] = 1003;
 
             highlightStyle['z-index'] = 1001;
-            highlightStyle['border-radius'] = '5px';
             highlightStyle['background-color'] = 'rgba(255,255,255,.95)';
             highlightStyle['box-shadow'] = 'rgb(146,160,169) 1px 3px 21px';
             highlightStyle['transition'] = 'all .3s ease-in';

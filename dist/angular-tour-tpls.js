@@ -255,18 +255,17 @@
                 transition: 'all .05s linear .295s'
               });
               var top = position.top + window.pageYOffset;
+              var left = position.left + window.pageXOffset;
               var highlightStyle = {};
               highlightStyle.position = 'absolute';
-              highlightStyle.top = top - 14;
-              highlightStyle.left = position.left - 14;
+              highlightStyle.top = top;
+              highlightStyle.left = left;
               highlightStyle.width = targetElement[0].offsetWidth;
               highlightStyle.height = targetElement[0].offsetHeight;
-              highlightStyle.padding = '14px';
               var highlightBlockrStyle = angular.copy(highlightStyle);
               highlightBlockrStyle.background = 'transparent';
               highlightBlockrStyle['z-index'] = 1003;
               highlightStyle['z-index'] = 1001;
-              highlightStyle['border-radius'] = '5px';
               highlightStyle['background-color'] = 'rgba(255,255,255,.95)';
               highlightStyle['box-shadow'] = 'rgb(146,160,169) 1px 3px 21px';
               highlightStyle['transition'] = 'all .3s ease-in';
@@ -278,25 +277,25 @@
               case 'right':
                 ttPosition = {
                   top: top - arrowTop - height / 2,
-                  left: position.left + width + scope.ttOffset
+                  left: left + width + scope.ttOffset
                 };
                 break;
               case 'bottom':
                 ttPosition = {
                   top: top + height + scope.ttOffset,
-                  left: position.left
+                  left: left
                 };
                 break;
               case 'left':
                 ttPosition = {
                   top: top - arrowTop - height / 2,
-                  left: position.left - ttWidth - scope.ttOffset
+                  left: left - ttWidth - scope.ttOffset
                 };
                 break;
               default:
                 ttPosition = {
                   top: top - ttHeight - scope.ttOffset,
-                  left: position.left
+                  left: left
                 };
                 break;
               }

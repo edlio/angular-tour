@@ -317,11 +317,12 @@ angular.module('angular-tour.tour', [])
               );
 
             var top = position.top + window.pageYOffset;
+            var left = position.left + window.pageXOffset;
 
             var highlightStyle = {};
             highlightStyle.position = 'absolute';
             highlightStyle.top = top;
-            highlightStyle.left = position.left;
+            highlightStyle.left = left;
             highlightStyle.width = targetElement[0].offsetWidth;
             highlightStyle.height = targetElement[0].offsetHeight;
 
@@ -345,25 +346,25 @@ angular.module('angular-tour.tour', [])
             case 'right':
               ttPosition = {
                 top: top - arrowTop - (height/2),
-                left: position.left + width + scope.ttOffset
+                left: left + width + scope.ttOffset
               };
               break;
             case 'bottom':
               ttPosition = {
                 top: top + height + scope.ttOffset,
-                left: position.left
+                left: left
               };
               break;
             case 'left':
               ttPosition = {
                 top: top - arrowTop - (height/2),
-                left: position.left - ttWidth - scope.ttOffset
+                left: left - ttWidth - scope.ttOffset
               };
               break;
             default:
               ttPosition = {
                 top: top - ttHeight - scope.ttOffset,
-                left: position.left
+                left: left
               };
               break;
             }

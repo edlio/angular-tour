@@ -1,6 +1,6 @@
 /**
  * An AngularJS directive for showcasing features of your website
- * @version v0.1.1 - 2015-01-13
+ * @version v0.1.1 - 2015-01-14
  * @link https://github.com/DaftMonk/angular-tour
  * @author Tyler Henkel
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -130,9 +130,9 @@
                 left: 0,
                 right: 0,
                 position: 'fixed',
-                opacity: 0.8,
-                'background-color': '#000',
+                opacity: 1,
                 'z-index': '1000',
+                'background-color': 'rgba(255,255,255,.382)',
                 'transition': 'all .5s ease-out'
               });
               angular.element('body').append(backdrop);
@@ -257,16 +257,18 @@
               var top = position.top + window.pageYOffset;
               var highlightStyle = {};
               highlightStyle.position = 'absolute';
-              highlightStyle.top = top;
-              highlightStyle.left = position.left;
+              highlightStyle.top = top - 14;
+              highlightStyle.left = position.left - 14;
               highlightStyle.width = targetElement[0].offsetWidth;
               highlightStyle.height = targetElement[0].offsetHeight;
+              highlightStyle.padding = '14px';
               var highlightBlockrStyle = angular.copy(highlightStyle);
               highlightBlockrStyle.background = 'transparent';
               highlightBlockrStyle['z-index'] = 1003;
               highlightStyle['z-index'] = 1001;
+              highlightStyle['border-radius'] = '5px';
               highlightStyle['background-color'] = 'rgba(255,255,255,.95)';
-              highlightStyle['box-shadow'] = '0 2px 15px rgba(0,0,0,.4)';
+              highlightStyle['box-shadow'] = 'rgb(146,160,169) 1px 3px 21px';
               highlightStyle['transition'] = 'all .3s ease-in';
               angular.element('.tourtip-highlight-helper').css(highlightStyle);
               tourtipHighlightBlockr.css(highlightBlockrStyle);
